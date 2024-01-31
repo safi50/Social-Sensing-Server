@@ -1,5 +1,7 @@
-from flask import Flask, jsonify, render_template
-from pymongo import MongoClient
+from flask import Flask, render_template
+# from pymongo import MongoClient, PyMongo
+from flask_pymongo import PyMongo
+
 import re
 from nltk.corpus import stopwords
 from nltk.tokenize import RegexpTokenizer
@@ -15,22 +17,30 @@ import time
 # nltk.download('wordnet')
 
 
-### Client connection to MongoDB Atlas
-client = MongoClient('mongodb+srv://sshahbscs20seecs:sFiIJeI6YV2guDkc@cluster0.1fxixvl.mongodb.net/?retryWrites=true&w=majority')
-### Fetching Data
-db = client['Psl_data']
-collection = db['tweets']
-documents = collection.find()
-tweets = [doc['tweet'] for i, doc in enumerate(documents) if i < 500]
+
+
+### Initializing the Flask app
+app = Flask(__name__)
+# app.config['MONGO_URI'] = "mongodb+srv://sshahbscs20seecs:sFiIJeI6YV2guDkc@cluster0.1fxixvl.mongodb.net/Psl_data?retryWrites=true&w=majority"
+app.config['MONGO_URI'] = "mongodb+srv://safi:safi123@cluster0.1fxixvl.mongodb.net/Psl_data?retryWrites=true&w=majority"
+mongo = PyMongo(app)
+# Browse tweets collections from Psldata database
+docs = mongo.db.tweets.find().limit(5)
+tweets = [doc['tweet'] for i, doc in enumerate(docs) if i < 5]
+CORS(app)
+
+# ### Client connection to MongoDB Atlas
+# client = MongoClient('mongodb+srv://sshahbscs20seecs:sFiIJeI6YV2guDkc@cluster0.1fxixvl.mongodb.net/?retryWrites=true&w=majority')
+# ### Fetching Data
+# db = client['Psl_data']
+# collection = db['tweets']
+# documents = collection.find().limit(5)
+# tweets = [doc['tweet'] for i, doc in enumerate(documents) if i < 5]
 
 ### Initializing the preprocessing tools
 tokenizer = RegexpTokenizer(r'\w+')
 en_stopwords = set(stopwords.words('english'))
 lemmatizer = WordNetLemmatizer()
-
-### Initializing the Flask app
-app = Flask(__name__)
-CORS(app)
 
 
 def processTweet(tweet):
@@ -71,9 +81,13 @@ def lda(num_topics=1):
         weight = float(weight)
         lda_data.append({"text": word, "value": (round(weight, 4) * 2000)})
 
-    client.close()
+    # client.close()
     return lda_data
 
+
+@app.route('/')
+def home():
+    return render_template('index.html', wordcloud_path=None)  
 
 @app.route('/lda', methods=['GET'])
 def generate_lda():
@@ -81,4 +95,4 @@ def generate_lda():
     return lda_results
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=8000)
