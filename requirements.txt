@@ -5,3 +5,4 @@ langdetect
 gensim 
 flask_cors
 flask_pymongo
+pysqlite3

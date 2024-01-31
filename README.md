@@ -6,10 +6,10 @@ This repository is for the deployment of the Flask server api's for the Social S
  ### Install Dependencies
 ```
  cd backend
- pip install -r requirements.txt
+ pip3 install -r requirements.txt
 ```
 ### Run Flask App
 
 ```
- python app.py
+ python3 app.py
 ```
