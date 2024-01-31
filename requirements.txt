@@ -1,6 +1,7 @@
-flask 
+Flask 
 pymongo
 nltk
 langdetect
 gensim 
 flask_cors
+gunicorn
