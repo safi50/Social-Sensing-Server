@@ -1,0 +1,6 @@
+flask 
+pymongo
+nltk
+langdetect
+gensim 
+flask_cors
