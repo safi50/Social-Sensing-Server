@@ -10,12 +10,13 @@ from gensim import corpora
 from gensim.models.ldamodel import LdaModel
 from flask_cors import CORS
 import time
+import nltk
 import json
 from datetime import datetime, timedelta
 
 ### Uncomment the following lines if you are running the app for the first time
-# nltk.download('stopwords')
-# nltk.download('wordnet')
+nltk.download('stopwords')
+nltk.download('wordnet')
 
 ### Initializing the Flask app
 app = Flask(__name__)
