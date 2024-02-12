@@ -1,1 +1,4 @@
 Dockerfile
+server/
+.DS_Store
+__pycache__/
