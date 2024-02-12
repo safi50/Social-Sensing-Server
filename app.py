@@ -93,11 +93,11 @@ def generate_lda_variable(num_tweets):
 def generate_lda_by_time(time_duration):
     base_date = datetime.strptime("30-03-2022", "%d-%m-%Y")  # Reference date
 
-    if time_duration == '1day':
+    if time_duration == '1d':
         start_date = base_date - timedelta(days=1)
-    elif time_duration == '1week':
+    elif time_duration == '1w':
         start_date = base_date - timedelta(weeks=1)
-    elif time_duration == '1month':
+    elif time_duration == '1m':
         start_date = base_date - timedelta(days=30)  
     else:
         return jsonify({"error": "Unsupported time duration"}), 400
