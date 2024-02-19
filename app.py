@@ -75,7 +75,7 @@ def lda(num_tweets=50, num_topics=1, tweets=None):
 def extract_emojis(text):
     return [char for char in text if emoji.is_emoji(char)]
 
-def lda_emojis(tweets, num_topics=1):
+def lda_emojis(num_tweets=50, num_topics=1, tweets=None):
     # Extract emojis from all tweets
     all_emojis = [extract_emojis(tweet) for tweet in tweets]
     # Flatten the list of lists into a single list of emojis
@@ -99,7 +99,7 @@ def generate_lda():
     lda_results = lda()
     return lda_results
 
-@app.route('/lda/emoji', methods=['GET'])
+@app.route('/lda/emojis', methods=['GET'])
 def generate_lda_emojis():
     lda_results = lda_emojis(tweets)
     return (lda_results)
@@ -149,6 +149,43 @@ def generate_lda_by_time(time_duration):
 
     return jsonify(lda_results)
 
+
+@app.route('/lda/emojis/time/<time_duration>', methods=['GET'])
+def generate_lda_emoji_by_time(time_duration):
+    base_date = datetime.strptime("30-03-2022", "%d-%m-%Y")  # Reference date
+
+    if time_duration == '1d':
+        start_date = base_date - timedelta(days=1)
+    elif time_duration == '1w':
+        start_date = base_date - timedelta(weeks=1)
+    elif time_duration == '1m':
+        start_date = base_date - timedelta(days=30)  
+    else:
+        return jsonify({"error": "Unsupported time duration"}), 400
+    # Converting start_date to the format used in MongoDB collection
+    start_date_str = start_date.strftime("%Y-%m-%d")
+    
+    start = time.time()
+
+    docs = mongo.db.tweets.find({
+        "created_at": {
+            "$gte": start_date_str + " 00:00:00 Pakistan Standard Time",
+            "$lte": base_date.strftime("%Y-%m-%d") + " 23:59:59 Pakistan Standard Time"
+        }
+    }).limit(350)
+
+    filtered_tweets = [doc['tweet'] for doc in docs]
+    print(len(filtered_tweets))
+
+    if len(filtered_tweets) == 0:
+        return jsonify({"error": "No tweets found for the specified time duration"}), 404
+    
+    # Now calling lda with the filtered_tweets
+    lda_results = lda_emojis(tweets=filtered_tweets, num_tweets=len(filtered_tweets)) 
+    end = time.time()
+    print(f"Time taken: {end - start} seconds")
+
+    return jsonify(lda_results)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8000)
