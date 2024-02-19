@@ -13,6 +13,7 @@ import time
 import nltk
 import json
 from datetime import datetime, timedelta
+import emoji
 
 ### Uncomment the following lines if you are running the app for the first time
 nltk.download('stopwords')
@@ -65,11 +66,28 @@ def lda(num_tweets=50, num_topics=1, tweets=None):
     # Creating the LDA model
     lda_model = LdaModel(doc_term_matrix, num_topics=num_topics, id2word=dictionary, passes=2)
     lda_data = []
-    for word, weight in lda_model.show_topic(0, 200):
-        lda_data.append({"text": word, "value": (round(float(weight), 4) * 2500)})
+    for word, weight in lda_model.show_topic(0, 50):
+        lda_data.append({"text": word, "value": (round(float(weight), 4) * 3000) + 100})
 
     return lda_data
 
+
+def extract_emojis(text):
+    return [char for char in text if emoji.is_emoji(char)]
+
+def lda_emojis(tweets, num_topics=1):
+    # Extract emojis from all tweets
+    all_emojis = [extract_emojis(tweet) for tweet in tweets]
+    # Flatten the list of lists into a single list of emojis
+    all_emojis = [emoji for sublist in all_emojis for emoji in sublist]
+    dictionary = corpora.Dictionary([all_emojis])
+    corpus = [dictionary.doc2bow([emoji]) for emoji in all_emojis]
+    # LDA model
+    lda_model = LdaModel(corpus, num_topics=num_topics, id2word=dictionary, passes=5)
+    lda_data = []
+    for emoji, weight in lda_model.show_topic(topicid=0, topn=50):
+        lda_data.append({"emoji": emoji, "value": (round(float(weight), 4) * 3000) + 100})
+    return lda_data
 
 
 @app.route('/')
@@ -80,6 +98,11 @@ def home():
 def generate_lda():
     lda_results = lda()
     return lda_results
+
+@app.route('/lda/emoji', methods=['GET'])
+def generate_lda_emojis():
+    lda_results = lda_emojis(tweets)
+    return (lda_results)
 
 @app.route('/lda/<int:num_tweets>', methods=['GET'])
 def generate_lda_variable(num_tweets):
