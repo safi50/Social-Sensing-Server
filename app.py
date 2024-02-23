@@ -8,10 +8,7 @@ from gensim import corpora
 from gensim.models.ldamodel import LdaModel
 from flask_cors import CORS
 import nltk
-from datetime import datetime, timedelta
 import emoji
-
-from tweetsData import tweets
 
 ### Uncomment the following lines if you are running the app for the first time
 nltk.download('stopwords')

@@ -3,5 +3,6 @@ server/
 .DS_Store
 __pycache__/
 oldapp.py
-tweetsData.py
+tweetsData
+
 ```
