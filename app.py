@@ -1,6 +1,4 @@
-from flask import Flask, jsonify, render_template
-# from pymongo import MongoClient, PyMongo
-from flask_pymongo import PyMongo
+from flask import Flask, jsonify, render_template, request
 import re
 from nltk.corpus import stopwords
 from nltk.tokenize import RegexpTokenizer
@@ -9,11 +7,11 @@ from langdetect import detect, LangDetectException
 from gensim import corpora
 from gensim.models.ldamodel import LdaModel
 from flask_cors import CORS
-import time
 import nltk
-import json
 from datetime import datetime, timedelta
 import emoji
+
+from tweetsData import tweets
 
 ### Uncomment the following lines if you are running the app for the first time
 nltk.download('stopwords')
@@ -21,12 +19,6 @@ nltk.download('wordnet')
 
 ### Initializing the Flask app
 app = Flask(__name__)
-app.config['MONGO_URI'] = "mongodb+srv://safi:safi123@cluster0.1fxixvl.mongodb.net/Psl_data?retryWrites=true&w=majority"
-mongo = PyMongo(app)
-### Browse tweets collections from Psldata database
-# mongo.db.tweets.create_index([("created_at", 1)])
-docs = mongo.db.tweets.find().limit(250)
-tweets = [doc['tweet'] for i, doc in enumerate(docs) if i < 250]
 CORS(app)
 
 ### Initializing the preprocessing tools
@@ -94,97 +86,22 @@ def lda_emojis(num_tweets=50, num_topics=1, tweets=None):
 def home():
     return render_template('index.html', wordcloud_path=None)  
 
-@app.route('/lda', methods=['GET'])
+@app.route('/lda', methods=['POST'])
 def generate_lda():
-    lda_results = lda()
-    return lda_results
+    data = request.get_json()  # Get data sent to the endpoint
+    tweets = data.get('tweets', [])  # Extract tweets from data
+    if not tweets:
+        return jsonify({"error": "No tweets provided"}), 400
+    lda_results = lda(tweets=tweets)  
+    return jsonify(lda_results)
 
-@app.route('/lda/emojis', methods=['GET'])
+@app.route('/lda/emojis', methods=['POST'])
 def generate_lda_emojis():
-    lda_results = lda_emojis(tweets)
-    return (lda_results)
-
-@app.route('/lda/<int:num_tweets>', methods=['GET'])
-def generate_lda_variable(num_tweets):
-    if num_tweets not in [i for i in range(1, 251)]:  # Only support 1-250 tweets for now
-        return jsonify({"error": "Unsupported number of tweets"}), 400
-    lda_results = lda(num_tweets=num_tweets)
-    return jsonify(lda_results)
-
-
-@app.route('/lda/time/<time_duration>', methods=['GET'])
-def generate_lda_by_time(time_duration):
-    base_date = datetime.strptime("30-03-2022", "%d-%m-%Y")  # Reference date
-
-    if time_duration == '1d':
-        start_date = base_date - timedelta(days=1)
-    elif time_duration == '1w':
-        start_date = base_date - timedelta(weeks=1)
-    elif time_duration == '1m':
-        start_date = base_date - timedelta(days=30)  
-    else:
-        return jsonify({"error": "Unsupported time duration"}), 400
-    # Converting start_date to the format used in MongoDB collection
-    start_date_str = start_date.strftime("%Y-%m-%d")
-    
-    start = time.time()
-
-    docs = mongo.db.tweets.find({
-        "created_at": {
-            "$gte": start_date_str + " 00:00:00 Pakistan Standard Time",
-            "$lte": base_date.strftime("%Y-%m-%d") + " 23:59:59 Pakistan Standard Time"
-        }
-    }).limit(250)
-
-    filtered_tweets = [doc['tweet'] for doc in docs]
-    print(len(filtered_tweets))
-
-    if len(filtered_tweets) == 0:
-        return jsonify({"error": "No tweets found for the specified time duration"}), 404
-    
-    # Now calling lda with the filtered_tweets
-    lda_results = lda(tweets=filtered_tweets, num_tweets=len(filtered_tweets)) 
-    end = time.time()
-    print(f"Time taken: {end - start} seconds")
-
-    return jsonify(lda_results)
-
-
-@app.route('/lda/emojis/time/<time_duration>', methods=['GET'])
-def generate_lda_emoji_by_time(time_duration):
-    base_date = datetime.strptime("30-03-2022", "%d-%m-%Y")  # Reference date
-
-    if time_duration == '1d':
-        start_date = base_date - timedelta(days=1)
-    elif time_duration == '1w':
-        start_date = base_date - timedelta(weeks=1)
-    elif time_duration == '1m':
-        start_date = base_date - timedelta(days=30)  
-    else:
-        return jsonify({"error": "Unsupported time duration"}), 400
-    # Converting start_date to the format used in MongoDB collection
-    start_date_str = start_date.strftime("%Y-%m-%d")
-    
-    start = time.time()
-
-    docs = mongo.db.tweets.find({
-        "created_at": {
-            "$gte": start_date_str + " 00:00:00 Pakistan Standard Time",
-            "$lte": base_date.strftime("%Y-%m-%d") + " 23:59:59 Pakistan Standard Time"
-        }
-    }).limit(350)
-
-    filtered_tweets = [doc['tweet'] for doc in docs]
-    print(len(filtered_tweets))
-
-    if len(filtered_tweets) == 0:
-        return jsonify({"error": "No tweets found for the specified time duration"}), 404
-    
-    # Now calling lda with the filtered_tweets
-    lda_results = lda_emojis(tweets=filtered_tweets, num_tweets=len(filtered_tweets)) 
-    end = time.time()
-    print(f"Time taken: {end - start} seconds")
-
+    data = request.get_json()  
+    tweets = data.get('tweets', []) 
+    if not tweets:
+        return jsonify({"error": "No tweets provided"}), 400
+    lda_results = lda_emojis(tweets=tweets) 
     return jsonify(lda_results)
 
 if __name__ == '__main__':
