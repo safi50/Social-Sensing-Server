@@ -1,3 +1,4 @@
+import collections
 from flask import Flask, jsonify, render_template, request
 import re
 from nltk.corpus import stopwords
@@ -9,6 +10,8 @@ from gensim.models.ldamodel import LdaModel
 from flask_cors import CORS
 import nltk
 import emoji
+import random
+from pymongo import MongoClient
 
 ### Uncomment the following lines if you are running the app for the first time
 nltk.download('stopwords')
@@ -16,6 +19,11 @@ nltk.download('wordnet')
 
 ### Initializing the Flask app
 app = Flask(__name__)
+
+client = MongoClient("mongodb+srv://safi:safi123@cluster0.1fxixvl.mongodb.net/?retryWrites=true&w=majority")  # Replace 'mongodb_connection_string' with your MongoDB connection string
+db = client['Psl_data']  # Replace 'your_database_name' with the name of your database
+collections = db['tweets']
+
 CORS(app)
 
 ### Initializing the preprocessing tools
@@ -100,6 +108,20 @@ def generate_lda_emojis():
         return jsonify({"error": "No tweets provided"}), 400
     lda_results = lda_emojis(tweets=tweets) 
     return jsonify(lda_results)
+
+@app.route('/get_random_tweets', methods=['GET'])
+def getRandomTweets():
+    # Generate a random number for the number of tweets to fetch
+    random_number = random.randint(10, 100)  # You can adjust the upper limit based on your requirement
+
+    # Use aggregation with $sample to get random documents
+    random_tweets = list(collections.aggregate([{'$sample': {'size': random_number}}]))
+
+    # Convert the ObjectId to string to make it JSON serializable
+    for tweet in random_tweets:
+        tweet['_id'] = str(tweet['_id'])
+
+    return jsonify(random_tweets)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8000)
