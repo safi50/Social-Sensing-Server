@@ -4,5 +4,4 @@ server/
 __pycache__/
 oldapp.py
 tweetsData
-
-```
+mongodb-server/node_modules/
