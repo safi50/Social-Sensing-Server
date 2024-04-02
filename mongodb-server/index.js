@@ -13,7 +13,6 @@ dotenv.config();
 
 const app = express(); 
 
-
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -23,14 +22,12 @@ app.use(
       methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
       credentials: true, // Enable credentials (cookies) to be sent with the request
     })
-  );
+);
 
-app.listen(process.env.PORT, () => {
-    console.log("Server is running on Port:",process.env.PORT);
-    connectDB();
-})
+connectDB(); // Connect to the database
 
-app.use('/user',userRoutes);
+app.use('/user', userRoutes);
 app.use('/auth', authRoutes);
 app.use('/search', searchRoutes);
 
+module.exports = app; // Export the Express app for serverless deployment
