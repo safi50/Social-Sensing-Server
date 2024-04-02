@@ -15,7 +15,6 @@ const app = express();
 
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cookieParser());
 app.use(
     cors({
       origin: true,
@@ -23,6 +22,8 @@ app.use(
       credentials: true, // Enable credentials (cookies) to be sent with the request
     })
 );
+app.use(cookieParser());
+
 
 connectDB(); // Connect to the database
 
