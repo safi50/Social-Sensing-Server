@@ -30,4 +30,3 @@ app.use('/user', userRoutes);
 app.use('/auth', authRoutes);
 app.use('/search', searchRoutes);
 
-module.exports = app; // Export the Express app for serverless deployment
