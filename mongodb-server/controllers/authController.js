@@ -5,7 +5,7 @@ const nodemailer = require('nodemailer');
 const dotenv = require('dotenv');
 dotenv.config();
 
-const api_url = 'http://localhost:3000';
+const api_url = 'https://social-sensing-frontend.vercel.app';
 
 
 async function generateResetToken() {
@@ -90,3 +90,4 @@ exports.sendEmail = async (req, res) => {
         res.status(500).json({ message: 'An error occurred. Please try again later.' });
     }
 };
+

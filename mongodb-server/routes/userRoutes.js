@@ -28,5 +28,7 @@ router.post('/updatePassword', [
 
 router.post('/signout', UserController.signout);
 
+router.get('/testing', UserController.testing);
+
 
 module.exports = router;

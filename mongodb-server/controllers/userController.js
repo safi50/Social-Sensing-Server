@@ -101,8 +101,12 @@ exports.updatePassword = async (req, res) => {
     }
   };
 
-
   exports.signout = (res) => {
     res.clearCookie('token');
     res.status(200).json({ message: 'User Logged Out Successfully' });
   };
+
+  exports.testing = (req, res) => {
+    res.send("*** Routes Working Fine! ***");
+  };
+
