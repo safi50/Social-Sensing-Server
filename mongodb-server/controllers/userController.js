@@ -36,8 +36,7 @@ exports.register = async (req, res) => {
         });
 
         // save token in cookies 
-        // res.cookie('token', token);
-        res.cookie('token', token, { sameSite: 'none', secure: true, maxAge: 86400, httpOnly: false});
+        // res.cookie('token', token, { sameSite: 'none', secure: true, maxAge: 86400, httpOnly: false});
 
         return res.status(200).json({
             message: "User Registered Successfully!",
@@ -63,8 +62,8 @@ exports.login = async (req, res) => {
         expiresIn: 86400
     });
 
-    // res.cookie('token', token );
-    res.cookie('token', token, { sameSite: 'none', secure: true, maxAge: 86400});
+    // save token in cookies 
+    // res.cookie('token', token, { sameSite: 'none', secure: true, maxAge: 86400});
 
    return res.status(200).json({
         message: "User Logged In Successfully", 
