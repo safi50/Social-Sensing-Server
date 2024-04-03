@@ -21,7 +21,7 @@ nltk.download('wordnet')
 app = Flask(__name__)
 
 client = MongoClient("mongodb+srv://safi:safi123@cluster0.1fxixvl.mongodb.net/?retryWrites=true&w=majority")  # Replace 'mongodb_connection_string' with your MongoDB connection string
-db = client['Psl_data']  # Replace 'your_database_name' with the name of your database
+db = client['Psl_data']  
 collections = db['tweets']
 
 CORS(app)
