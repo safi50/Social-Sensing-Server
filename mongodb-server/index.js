@@ -16,8 +16,10 @@ const app = express();
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(
+  app.use(
     cors({
-      origin: true,
+      // TODO: Change Server Link when deploying to production
+      origin: ['https://social-sensing-frontend.vercel.app'], 
       methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
       credentials: true, // Enable credentials (cookies) to be sent with the request
     })
