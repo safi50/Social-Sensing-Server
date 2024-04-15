@@ -5,6 +5,8 @@ const bcrypt = require('bcrypt');
 const dotenv = require('dotenv')
 dotenv.config();
 
+
+// signup a user
 exports.register = async (req, res) => {
     const errors = validationResult(req); 
     const {firstName, lastName, email, companyName, password}  = req.body;
@@ -45,6 +47,8 @@ exports.register = async (req, res) => {
         })
 };
 
+
+// validate a user's credential and provide token
 exports.login = async (req, res) => {
     const {email, password} = req.body;
 
@@ -72,6 +76,7 @@ exports.login = async (req, res) => {
 };
 
 
+// update user's password, given the token and new password
 exports.updatePassword = async (req, res) => {
     const { token, newPassword } = req.body; 
   
