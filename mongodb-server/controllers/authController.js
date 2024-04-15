@@ -20,6 +20,8 @@ async function generateResetToken() {
     });
 }
 
+
+// saves a reset token along with the expiration time
 async function saveResetToken(email, token) {
     const user = await User.findOne({ email });
     if (!user) {
@@ -30,6 +32,8 @@ async function saveResetToken(email, token) {
     await user.save();
 }
 
+
+// for a user send an email for resetting the password
 async function sendResetPasswordEmail(user) {
     const token = await generateResetToken();
     await saveResetToken(user.email, token);
@@ -72,6 +76,7 @@ async function sendResetPasswordEmail(user) {
 }
 
 
+// send email for reset password given an email address
 exports.sendEmail = async (req, res) => {
     const { email } = req.body;
 
