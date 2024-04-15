@@ -1,6 +1,7 @@
 const SavedSearch = require('../models/SavedSearch');
 
 
+// for a userId return all the corresponding saved searches
 exports.getSearches = async (req, res) => {
   try {
     const { userId } = req.query; // Extract userId from request query
@@ -15,6 +16,8 @@ exports.getSearches = async (req, res) => {
   }
 };
 
+
+// save a search query for a userId
 exports.saveSearch = async (req, res) => {
   try {
     const { userId, name, labels, hashtags, region } = req.body;
@@ -38,6 +41,7 @@ exports.saveSearch = async (req, res) => {
 };
 
 
+// delete one search with searchId of the user userId
 exports.deleteSearch = async (req, res) => {
   try {
     const { userId, searchId } = req.body;
@@ -53,6 +57,8 @@ exports.deleteSearch = async (req, res) => {
     }
 }
 
+
+// update a savedSearch value of userId
 exports.updateSearch = async (req, res) => {
   try {
     const { userId, searchId, name } = req.body;
