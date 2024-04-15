@@ -32,6 +32,7 @@ en_stopwords = set(stopwords.words('english'))
 lemmatizer = WordNetLemmatizer()
 
 
+# clean the tweet text by removing unnecessary text
 def processTweet(tweet):
     try:
         # Check if the tweet is in English
@@ -47,6 +48,7 @@ def processTweet(tweet):
     return cleaned_tokens
 
 
+# find weights of words in the tweets list
 def lda(num_tweets=50, num_topics=1, tweets=None):
     # If no specific tweets are provided, use the global tweets
     if tweets is None:
@@ -69,9 +71,12 @@ def lda(num_tweets=50, num_topics=1, tweets=None):
     return lda_data
 
 
+# filter emojis from text
 def extract_emojis(text):
     return [char for char in text if emoji.is_emoji(char)]
 
+
+# find weights of emojis in the tweets list
 def lda_emojis(num_tweets=50, num_topics=1, tweets=None):
     # Extract emojis from all tweets
     all_emojis = [extract_emojis(tweet) for tweet in tweets]
@@ -91,6 +96,8 @@ def lda_emojis(num_tweets=50, num_topics=1, tweets=None):
 def home():
     return render_template('index.html', wordcloud_path=None)  
 
+
+# generates word cloud
 @app.route('/lda', methods=['POST'])
 def generate_lda():
     data = request.get_json()  # Get data sent to the endpoint
@@ -100,6 +107,8 @@ def generate_lda():
     lda_results = lda(tweets=tweets)  
     return jsonify(lda_results)
 
+
+# generates word cloud for emojis
 @app.route('/lda/emojis', methods=['POST'])
 def generate_lda_emojis():
     data = request.get_json()  
@@ -109,6 +118,8 @@ def generate_lda_emojis():
     lda_results = lda_emojis(tweets=tweets) 
     return jsonify(lda_results)
 
+
+# pick a random set of tweets from database
 @app.route('/get_random_tweets', methods=['GET'])
 def getRandomTweets():
     # Generate a random number for the number of tweets to fetch
