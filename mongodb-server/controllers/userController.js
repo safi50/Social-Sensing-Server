@@ -43,7 +43,8 @@ exports.register = async (req, res) => {
         return res.status(200).json({
             message: "User Registered Successfully!",
             ...result._doc, 
-            token
+            token,
+            id: result._id
         })
 };
 
@@ -71,7 +72,8 @@ exports.login = async (req, res) => {
 
    return res.status(200).json({
         message: "User Logged In Successfully", 
-        token : token
+        token : token,
+        id: user._id
     });
 };
 
